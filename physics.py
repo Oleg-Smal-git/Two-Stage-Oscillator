@@ -141,21 +141,71 @@ class Oscillator:
                 f"inner_body: {type(inner_body)}, outer_body: {type(outer_body)}"
             )
 
+    # def calculate_acceleration(self):
+    #     self.outer_body.acceleration =\
+    #         -config.CONSTANTS["gravitational_acceleration"] * math.sin(self.outer_body.position) /\
+    #         self.outer_body.shaft_length
+    #
+    #     outer_tension =\
+    #         config.CONSTANTS["gravitational_acceleration"] * math.cos(self.outer_body.position) *\
+    #         self.outer_body.mass
+    #
+    #     self.inner_body.acceleration =\
+    #         -config.CONSTANTS["gravitational_acceleration"] * math.sin(self.inner_body.position)
+    #
+    #     self.inner_body.acceleration +=\
+    #         outer_tension / (self.inner_body.shaft_length * self.inner_body.mass) *\
+    #         math.sin(abs(self.inner_body.position - self.outer_body.position))
+
     def calculate_acceleration(self):
-        self.outer_body.acceleration =\
-            -config.CONSTANTS["gravitational_acceleration"] * math.sin(self.outer_body.position) /\
-            self.outer_body.shaft_length
-
-        outer_tension =\
-            config.CONSTANTS["gravitational_acceleration"] * math.cos(self.outer_body.position) *\
-            self.outer_body.mass
-
         self.inner_body.acceleration =\
-            -config.CONSTANTS["gravitational_acceleration"] * math.sin(self.inner_body.position)
+            (
+                -config.CONSTANTS["gravitational_acceleration"] *
+                (2 * self.inner_body.mass + self.outer_body.mass) *
+                math.sin(self.inner_body.position) -
 
-        self.inner_body.acceleration +=\
-            outer_tension / (self.inner_body.shaft_length * self.inner_body.mass) *\
-            math.sin(abs(self.inner_body.position - self.outer_body.position))
+                config.CONSTANTS["gravitational_acceleration"] *
+                self.outer_body.mass *
+                math.sin(self.inner_body.position - 2 * self.outer_body.position) -
+
+                2 * math.sin(self.inner_body.position - self.outer_body.position) *
+                self.outer_body.mass *
+                (
+                    math.pow(self.outer_body.velocity, 2) * self.outer_body.shaft_length +
+                    math.pow(self.inner_body.velocity, 2) * self.inner_body.shaft_length *
+                    math.cos(self.inner_body.position - self.outer_body.position)
+                )
+            ) /\
+            (
+                self.inner_body.shaft_length * (
+                    2 * self.inner_body.mass + self.outer_body.mass - self.outer_body.mass *
+                    math.cos(2 * self.inner_body.position - 2 * self.outer_body.position)
+                )
+            )
+
+        self.outer_body.acceleration =\
+            (
+                2 * math.sin(self.inner_body.position - self.outer_body.position) *
+                (
+                    math.pow(self.inner_body.velocity, 2) *
+                    self.inner_body.shaft_length *
+                    (self.inner_body.mass + self.outer_body.mass) +
+
+                    config.CONSTANTS["gravitational_acceleration"] *
+                    (self.inner_body.mass + self.outer_body.mass) *
+                    math.cos(self.inner_body.position) +
+
+                    math.pow(self.outer_body.velocity, 2) *
+                    self.outer_body.shaft_length * self.outer_body.mass *
+                    math.cos(self.inner_body.position - self.outer_body.position)
+                )
+            ) /\
+            (
+                self.outer_body.shaft_length * (
+                    2 * self.inner_body.mass + self.outer_body.mass - self.outer_body.mass *
+                    math.cos(2 * self.inner_body.position - 2 * self.outer_body.position)
+                )
+            )
 
     def step(self, delta_time=0.0):
         if isinstance(delta_time, int) or isinstance(delta_time, float):
@@ -177,4 +227,3 @@ class Oscillator:
                 self.outer_body.position += 2 * math.pi
         else:
             raise TypeError(f"Incompatible argument type: {type(delta_time)}")
-

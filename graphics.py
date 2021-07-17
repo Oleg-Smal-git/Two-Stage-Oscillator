@@ -66,7 +66,6 @@ class Simulation:
                 radius=3,
                 color=(255, 255, 255)
             ).draw()
-
         else:
             raise TypeError(f"Incompatible argument type: {type(origin)}")
 
