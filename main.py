@@ -9,14 +9,12 @@ if __name__ == '__main__':
             inner_body=physics.PointOscillatorBody(
                 mass=1.0,
                 shaft_length=100.0,
-                position=3 * math.pi / 2,
-                velocity=1.0
+                position=math.pi / 4,
             ),
             outer_body=physics.PointOscillatorBody(
-                mass=2.0,
+                mass=1.0,
                 shaft_length=100.0,
-                position=3 * math.pi / 2,
-                velocity=2.0
+                position=3 * math.pi / 8,
             )
         )
     ).run()

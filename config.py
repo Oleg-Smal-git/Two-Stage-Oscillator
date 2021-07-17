@@ -1,4 +1,5 @@
 CONSTANTS = {
-    "framerate": 60,
-    "gravitational_acceleration": 10
+    "framerate": 100,
+    "calculation_scale": 100,
+    "gravitational_acceleration": 20
 }

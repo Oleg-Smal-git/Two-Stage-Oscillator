@@ -15,13 +15,17 @@ class Simulation:
     def draw(self, origin=physics.Vector()):
         if isinstance(origin, physics.Vector):
             absolute_inner_body_position = physics.Vector(
-                x=math.cos(self.oscillator.inner_body.position) * self.oscillator.inner_body.shaft_length + origin.x,
-                y=math.sin(self.oscillator.inner_body.position) * self.oscillator.inner_body.shaft_length + origin.y
+                x=math.cos(self.oscillator.inner_body.position - math.pi / 2) *
+                self.oscillator.inner_body.shaft_length + origin.x,
+                y=math.sin(self.oscillator.inner_body.position - math.pi / 2) *
+                self.oscillator.inner_body.shaft_length + origin.y
             )
 
             absolute_outer_body_position = physics.Vector(
-                x=math.cos(self.oscillator.outer_body.position) * self.oscillator.outer_body.shaft_length,
-                y=math.sin(self.oscillator.outer_body.position) * self.oscillator.outer_body.shaft_length
+                x=math.cos(self.oscillator.outer_body.position - math.pi / 2) *
+                self.oscillator.outer_body.shaft_length,
+                y=math.sin(self.oscillator.outer_body.position - math.pi / 2) *
+                self.oscillator.outer_body.shaft_length
             ) + absolute_inner_body_position
 
             pyglet.shapes.Line(
@@ -68,16 +72,14 @@ class Simulation:
 
     def update(self, dt):
         self.window.clear()
-        self.oscillator.step(1 / config.CONSTANTS["framerate"])
+        for _ in range(config.CONSTANTS["calculation_scale"]):
+            self.oscillator.step(1 / (config.CONSTANTS["framerate"] * config.CONSTANTS["calculation_scale"]))
         self.draw(
             origin=physics.Vector(
                 x=self.window.width / 2,
                 y=self.window.height / 2
             )
         )
-        pyglet.text.Label(
-            text=f"{self.oscillator.inner_body.acceleration}"
-        ).draw()
 
     def run(self):
         pyglet.clock.schedule_interval(self.update, 1 / config.CONSTANTS["framerate"])

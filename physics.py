@@ -121,7 +121,7 @@ class PointOscillatorBody:
 
     def step(self, delta_time=0.0):
         if isinstance(delta_time, int) or isinstance(delta_time, float):
-            self.position += self.velocity * delta_time
+            self.position += self.velocity * delta_time + self.acceleration * math.pow(delta_time, 2) / 2
             self.velocity += self.acceleration * delta_time
         else:
             raise TypeError(f"Incompatible argument type: {type(delta_time)}")
@@ -143,7 +143,7 @@ class Oscillator:
 
     def calculate_acceleration(self):
         self.outer_body.acceleration =\
-            config.CONSTANTS["gravitational_acceleration"] * math.sin(self.outer_body.position) /\
+            -config.CONSTANTS["gravitational_acceleration"] * math.sin(self.outer_body.position) /\
             self.outer_body.shaft_length
 
         outer_tension =\
@@ -151,9 +151,11 @@ class Oscillator:
             self.outer_body.mass
 
         self.inner_body.acceleration =\
+            -config.CONSTANTS["gravitational_acceleration"] * math.sin(self.inner_body.position)
+
+        self.inner_body.acceleration +=\
             outer_tension / (self.inner_body.shaft_length * self.inner_body.mass) *\
-            math.sin(abs(self.inner_body.position - self.outer_body.position)) +\
-            config.CONSTANTS["gravitational_acceleration"] * math.sin(self.inner_body.position)
+            math.sin(abs(self.inner_body.position - self.outer_body.position))
 
     def step(self, delta_time=0.0):
         if isinstance(delta_time, int) or isinstance(delta_time, float):
