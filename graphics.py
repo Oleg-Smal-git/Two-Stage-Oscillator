@@ -72,7 +72,7 @@ class Simulation:
         self.draw(
             origin=physics.Vector(
                 x=self.window.width / 2,
-                y=self.window.width / 2
+                y=self.window.height / 2
             )
         )
         pyglet.text.Label(
